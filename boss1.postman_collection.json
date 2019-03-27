@@ -1,0 +1,54 @@
+{
+	"info": {
+		"_postman_id": "69093e4e-8c64-4b78-8817-e30d0abcfe36",
+		"name": "boss1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "登录",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0c2bf639-0df2-43df-8c79-ba1a30f42497",
+						"exec": [
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");",
+							"",
+							"var response=JSON.parse(responseBody);",
+							"tests[\"返回状态码验证\"]= responseCode.code===200;",
+							"tests[\"登录用户id验证\"]= response.id===1694;",
+							"tests[\"登录用户账户验证\"]= response.userName==='18291495154';"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\":\"18291495154\",\n\t\"password\":\"lifeccp\"\n}"
+				},
+				"url": {
+					"raw": "{{lifeccp_url}}/portaluser/users/login",
+					"host": [
+						"{{lifeccp_url}}"
+					],
+					"path": [
+						"portaluser",
+						"users",
+						"login"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
