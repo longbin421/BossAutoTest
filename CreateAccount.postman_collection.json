@@ -1,0 +1,328 @@
+{
+	"info": {
+		"_postman_id": "e88023fc-d21b-46fd-8bfe-762c76fb765b",
+		"name": "CreateAccount",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "创建账户",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "b6927667-cde4-4cad-a3e9-7a9f5ebc0a38",
+						"exec": [
+							"pm.environment.unset(\"newAccount\");",
+							"var acconut=\"{\\\"name\\\":\\\"test0123\\\",\\\"partnerId\\\":2471,\\\"partnerName\\\":\\\"bound(test07)\\\",\\\"tag\\\":1,\\\"salesIds\\\":[2489],\\\"hospitals\\\":[567]}\";",
+							"pm.environment.set(\"newAccount\", acconut);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "8f811555-bf8e-44ae-856c-2015f95828da",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var newAccountA={\"name\":\"test0123\",\"partnerId\":2471,\"partnerName\":\"bound(test07)\",\"tag\":1,\"salesIds\":[2489],\"operators\":[2512],\"hospitals\":[567]};",
+							"",
+							"pm.environment.set(\"accountName1\", newAccountA.name);",
+							"pm.environment.set(\"accountPartner_id1\", newAccountA.partnerId);",
+							"pm.environment.set(\"accountTag1\", newAccountA.tag);",
+							"pm.environment.set(\"hospitals1\", newAccountA.hospitals[0]);",
+							"pm.environment.set(\"salesIds\", newAccountA.hospitals[0]);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "SESSIONID",
+						"value": "6E7E366B433471D46E43B22CB84D741F",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{{newAccount}}"
+				},
+				"url": {
+					"raw": "{{lifeccp_url}}/besra/account/config",
+					"host": [
+						"{{lifeccp_url}}"
+					],
+					"path": [
+						"besra",
+						"account",
+						"config"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "验证账户基本信息",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a896c845-2298-4c1a-a217-07bfa68fad58",
+						"exec": [
+							"var jsonDate=JSON.parse(responseBody);",
+							"",
+							"var accountName1=pm.environment.get(\"accountName1\");",
+							"var accountPartner_id1=pm.environment.get(\"accountPartner_id1\");",
+							"var accountTag1=pm.environment.get(\"accountTag1\");",
+							"",
+							"var accountName2=jsonDate[0].name;",
+							"var accountPartner_id2=jsonDate[0].partner_id;",
+							"var accountTag2=jsonDate[0].tag;",
+							"",
+							"tests[\"验证创建新账户的姓名与数据库保存一致\"]=accountName1=accountName2;",
+							"//tests[\"验证创建新账户的partner_id与数据库一致\"]=accountPartner_id1=accountPartner_id2;",
+							"tests[\"验证创建新账户的类型一致\"]=accountTag1=accountTag2",
+							"pm.environment.set(\"accountId\", jsonDate[0].id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/account?_sort=-id",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"account"
+					],
+					"query": [
+						{
+							"key": "_sort",
+							"value": "-id"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "验证新建账户关联医院一致",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c8b1d9d4-1155-4c8e-9bb6-6f8a363c5471",
+						"exec": [
+							"var jsonDate=JSON.parse(responseBody);",
+							"",
+							"var accountHospitals1=pm.environment.get(\"hospitals1\");",
+							"var accountHospitals2=jsonDate[0].hospital_id;",
+							"tests[\"验证创建新账户关联的医院一致\"]=accountHospitals1=accountHospitals2;",
+							"tests[\"验证账户关联医院表中账户id是否一致\"]=jsonDate[0].account_id=pm.environment.get(\"accountId\");",
+							"pm.environment.set(\"accountHospitalId\",jsonDate[0].id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/account_hospital?_sort=-id",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"account_hospital"
+					],
+					"query": [
+						{
+							"key": "_sort",
+							"value": "-id"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "验证新建账户关联销售账号一致",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "451eaef5-c506-4bac-b609-3fd0dc5d5c6d",
+						"exec": [
+							"var jsonDate=JSON.parse(responseBody);",
+							"",
+							"var accountSalesIds1=pm.environment.get(\"salesIds\");",
+							"var accountSalesIds2=jsonDate[0].sales_id;",
+							"tests[\"验证创建新账户关联的销售账号一致\"]=accountSalesIds1=accountSalesIds2;",
+							"tests[\"验证账户关联销售账号表中账户id是否一致\"]=jsonDate[0].account_id=pm.environment.get(\"accountId\");",
+							"pm.environment.set(\"accountSaleId\",jsonDate[0].id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/account_sales?_sort=-id",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"account_sales"
+					],
+					"query": [
+						{
+							"key": "_sort",
+							"value": "-id"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "清除销售关系表中测试数据",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/account_sales/bulk?_ids={{accountSaleId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"account_sales",
+						"bulk"
+					],
+					"query": [
+						{
+							"key": "_ids",
+							"value": "{{accountSaleId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "清除账户医院表中测试数据",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/account_hospital/bulk?_ids={{accountHospitalId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"account_hospital",
+						"bulk"
+					],
+					"query": [
+						{
+							"key": "_ids",
+							"value": "{{accountHospitalId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "清除账户表中测试数据",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/account/bulk?_ids={{accountId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"account",
+						"bulk"
+					],
+					"query": [
+						{
+							"key": "_ids",
+							"value": "{{accountId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
